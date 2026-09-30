@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Connecting… | SteadyHRT</title></head>
+<body style="font:18px -apple-system,Helvetica,sans-serif;padding:40px;color:#3B1F33;background:#F6EEF2">
+<p id="m">Connecting SteadyHRT…</p>
+<script>
+  var q = location.search || '';
+  if (/[?&](code|error)=/.test(q)) location.replace('http://localhost:8765/callback' + q);
+  else document.getElementById('m').textContent = 'Nothing to do here.';
+</script></body></html>
