@@ -71,6 +71,13 @@ footer{margin:56px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);font
 <script>(function(){var K=['utm_source','utm_campaign'],s={};try{var q=new URLSearchParams(location.search);
 K.forEach(function(k){var v=q.get(k);if(v)sessionStorage.setItem(k,v.slice(0,80));s[k]=sessionStorage.getItem(k)||''})}catch(e){K.forEach(function(k){s[k]=''})}
 document.querySelectorAll('a[data-utm]').forEach(function(a){try{var u=new URL(a.href);K.forEach(function(k){if(s[k])u.searchParams.set(k,s[k])});a.href=u}catch(e){}});
-document.querySelectorAll('form[data-wl]').forEach(function(f){var h=f.querySelectorAll('input[type=hidden]');if(h[0])h[0].value=s.utm_source||'direct';if(h[1])h[1].value=s.utm_campaign||location.pathname;
-f.addEventListener('submit',function(e){e.preventDefault();if(f.website&&f.website.value)return;var b=f.querySelector('button');b.disabled=true;
-fetch(f.action,{method:'POST',mode:'no-cors',body:new URLSearchParams(new FormData(f))}).then(function(){f.parentNode.innerHTML='<h3>You’re on the list</h3><p>Thank you. We’ll email you when the app is ready.</p>'}).catch(function(){b.disabled=false;b.textContent='Try again'})})})})();</script></body></html>
+document.querySelectorAll('form[data-wl]').forEach(function(f){var src=s.utm_source||'direct',cam=s.utm_campaign||location.pathname;f.elements.utm_source.value=src;f.elements.utm_campaign.value=cam;
+var msg=f.parentNode.querySelector('.wl-msg');
+f.addEventListener('submit',function(e){e.preventDefault();if(f._honey&&f._honey.value)return;var em=f.elements.email.value.trim();
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){msg.textContent='Please enter a valid email address.';return}
+var b=f.querySelector('button');b.disabled=true;msg.textContent='';
+fetch(f.action,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({email:em,utm_source:src,utm_campaign:cam,page:location.pathname,_captcha:'false',_template:'table',_subject:'SteadyHRT waitlist signup ('+src+')'})})
+.then(function(r){return r.json()}).then(function(j){if(!(j&&(j.success===true||j.success==='true')))throw 0;
+try{window.umami&&window.umami.track('signup',{utm_source:src,utm_campaign:cam})}catch(x){}
+f.parentNode.innerHTML='<h3>You\u2019re on the list</h3><p>Thank you. We\u2019ll email you when the app is ready.</p>'})
+.catch(function(){b.disabled=false;msg.textContent='Sorry, that did not go through. Please try again in a moment.'})})})})();</script><script defer src="https://cloud.umami.is/script.js" data-website-id="f5faa915-707b-4d53-8c97-ae6e8bd0278f"></script></body></html>
