@@ -36,6 +36,8 @@ section{margin-top:34px}section .kicker+h2{margin-top:4px}.src a{overflow-wrap:a
 .demos{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 0}.demos figure{margin:0;flex:0 0 min(62%,230px);scroll-snap-align:start}.demos video{width:100%;aspect-ratio:9/16;background:#000;border-radius:14px}.demos figcaption{font-size:14px;color:var(--muted);margin-top:4px}
 .wl{background:var(--card);border-radius:18px;padding:20px 22px;margin:22px 0}.wl h3{margin-top:0}
 .wl form{display:flex;gap:10px;flex-wrap:wrap}.wl input[type=email]{flex:1 1 220px;padding:14px 16px;font:inherit;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.plans{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}.wl .plan{border:2px solid var(--line);flex:1 1 150px;display:flex;flex-direction:column;gap:2px;align-items:center;padding:14px 12px;border:2px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}.plan span{font-size:14px;color:var(--muted)}.plan[aria-pressed=true]{border-color:var(--accent);background:var(--card)}
+.wl form{margin-top:12px}.wl form[hidden]{display:none}.wl .reserve{flex:1 1 100%;margin:0}.wl .opt{flex:1 1 100%;border:0;padding:0;margin:6px 0 0;font-size:15px;color:var(--muted)}.wl .opt label{margin-right:12px;white-space:nowrap}
 .wl button{border:0;cursor:pointer;font:inherit}.wl .hp{position:absolute;left:-9999px}.wl small{display:block;margin-top:8px;color:var(--muted);font-size:14px}
 
 footer{margin:56px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
@@ -47,13 +49,20 @@ footer{margin:56px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);font
 <p class="lead">A simple tracker for women on HRT. Log doses and symptoms in 30 seconds a day, watch how things change week by week, and walk into your appointment with a one-page summary.</p>
 <div class="demos"><figure><video controls playsinline preload="metadata" src="demo-1.mp4#t=0.1"></video><figcaption>Log it in 30 seconds</figcaption></figure><figure><video controls playsinline preload="metadata" src="demo-2.mp4#t=0.1"></video><figcaption>What's changing, what isn't</figcaption></figure><figure><video controls playsinline preload="metadata" src="demo-3.mp4#t=0.1"></video><figcaption>Your one-page summary</figcaption></figure><figure><video controls playsinline preload="metadata" src="demo-4.mp4#t=0.1"></video><figcaption>Supply reminder</figcaption></figure></div><p class="src">Example data shown. SteadyHRT helps you track; it doesn't give medical advice.</p>
 <ul class="q"><li>30-second daily check-in: dose, symptoms, bleeding, notes</li><li>Your own chart: week 1 vs now, before and after any change</li><li>A one-page summary to bring to your doctor</li></ul>
-<div class="wl noprint" id="waitlist"><h3>Get early access</h3>
+<div class="wl noprint" id="waitlist" data-wl-box><h3>Get early access</h3>
 
-<form action="https://formsubmit.co/ajax/steadyhrt.app@gmail.com" data-wl novalidate>
+<p class="plans-q"><strong>Pick a plan to reserve your spot</strong> <span class="src">(planned pricing, nothing to pay today)</span></p>
+<div class="plans"><button type="button" class="plan" data-plan="year" aria-pressed="false"><strong>$49.99/year</strong><span>7-day free trial</span></button>
+<button type="button" class="plan" data-plan="month" aria-pressed="false"><strong>$7.99/month</strong></button></div>
+<p class="src"><a href="#waitlist" data-plan="none">Just notify me</a></p>
+<form action="https://formsubmit.co/ajax/steadyhrt.app@gmail.com" data-wl novalidate hidden>
+<p class="reserve"><span class="chosen"></span><span class="reserve-line"></span></p>
 <input type="email" name="email" placeholder="Your email" autocomplete="email" required aria-label="Email address">
-<input type="hidden" name="utm_source" value=""><input type="hidden" name="utm_campaign" value="">
+<input type="hidden" name="utm_source" value=""><input type="hidden" name="utm_campaign" value=""><input type="hidden" name="plan" value="none">
 <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-<button class="btn" type="submit">Get early access</button></form>
+<button class="btn" type="submit">Get early access</button>
+<fieldset class="opt"><legend>Optional: also taking a GLP-1 (e.g. Ozempic, Wegovy, Mounjaro)?</legend>
+<label><input type="radio" name="glp1" value="yes"> Yes</label> <label><input type="radio" name="glp1" value="considering"> Considering</label> <label><input type="radio" name="glp1" value="no"> No</label></fieldset></form>
 <small class="wl-msg" role="status"></small>
 <small class="wl-fine">Free to start. We'll only email you when the app is ready. <a href="/privacy/">Privacy</a></small></div>
 <p class="src">Evidence-based HRT info · not medical advice. <a href="/posts/">Read our sourced guides</a></p></main>
@@ -62,13 +71,23 @@ footer{margin:56px 0 0;padding:24px 0 40px;border-top:1px solid var(--line);font
 <script>(function(){var K=['utm_source','utm_campaign'],s={};try{var q=new URLSearchParams(location.search);
 K.forEach(function(k){var v=q.get(k);if(v)sessionStorage.setItem(k,v.slice(0,80));s[k]=sessionStorage.getItem(k)||''})}catch(e){K.forEach(function(k){s[k]=''})}
 document.querySelectorAll('a[data-utm]').forEach(function(a){try{var u=new URL(a.href);K.forEach(function(k){if(s[k])u.searchParams.set(k,s[k])});a.href=u}catch(e){}});
-document.querySelectorAll('form[data-wl]').forEach(function(f){var src=s.utm_source||'direct',cam=s.utm_campaign||location.pathname;f.elements.utm_source.value=src;f.elements.utm_campaign.value=cam;
-var msg=f.parentNode.querySelector('.wl-msg');
+document.querySelectorAll('[data-wl-box]').forEach(function(box){var f=box.querySelector('form[data-wl]'),msg=box.querySelector('.wl-msg'),
+src=s.utm_source||'direct',cam=s.utm_campaign||location.pathname,plan='none',label=box.querySelector('.chosen');
+f.elements.utm_source.value=src;f.elements.utm_campaign.value=cam;
+function track(n,d){try{window.umami&&window.umami.track(n,d)}catch(x){}}
+var NAMES={year:'$49.99/year (7-day free trial)',month:'$7.99/month',none:''};
+box.querySelectorAll('[data-plan]').forEach(function(el){el.addEventListener('click',function(e){e.preventDefault();plan=el.getAttribute('data-plan');f.elements.plan.value=plan;
+box.querySelectorAll('button[data-plan]').forEach(function(x){x.setAttribute('aria-pressed',x===el?'true':'false')});
+label.textContent=NAMES[plan]?'Your pick: '+NAMES[plan]+'. ':'';
+if(plan!=='none')track('price_click',{plan:plan,utm_source:src,utm_campaign:cam});
+box.querySelector('.reserve-line').textContent=plan==='none'?'We\u2019ll email you when the app is ready.':'Reserve your spot. Nothing to pay today; we\u2019ll email you when the app is ready.';
+f.hidden=false;f.elements.email.focus()})});
 f.addEventListener('submit',function(e){e.preventDefault();if(f._honey&&f._honey.value)return;var em=f.elements.email.value.trim();
 if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){msg.textContent='Please enter a valid email address.';return}
-var b=f.querySelector('button');b.disabled=true;msg.textContent='';
-fetch(f.action,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({email:em,utm_source:src,utm_campaign:cam,page:location.pathname,_captcha:'false',_template:'table',_subject:'SteadyHRT waitlist signup ('+src+')'})})
+var g=f.querySelector('input[name=glp1]:checked'),glp=g?g.value:'not answered';
+var b=f.querySelector('button[type=submit]');b.disabled=true;msg.textContent='';
+fetch(f.action,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({email:em,plan:plan,glp1:glp,utm_source:src,utm_campaign:cam,page:location.pathname,_captcha:'false',_template:'table',_subject:'SteadyHRT waitlist signup ('+src+', '+plan+')'})})
 .then(function(r){return r.json()}).then(function(j){if(!(j&&(j.success===true||j.success==='true')))throw 0;
-try{window.umami&&window.umami.track('signup',{utm_source:src,utm_campaign:cam})}catch(x){}
-f.parentNode.innerHTML='<h3>You\u2019re on the list</h3><p>Thank you. We\u2019ll email you when the app is ready.</p>'})
+track('signup',{plan:plan,glp1:glp,utm_source:src,utm_campaign:cam});
+box.innerHTML='<h3>You\u2019re on the list</h3><p>Thank you. We\u2019ll email you when the app is ready. Nothing to pay.</p>'})
 .catch(function(){b.disabled=false;msg.textContent='Sorry, that did not go through. Please try again in a moment.'})})})})();</script><script defer src="https://cloud.umami.is/script.js" data-website-id="f5faa915-707b-4d53-8c97-ae6e8bd0278f"></script></body></html>
