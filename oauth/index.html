@@ -4,6 +4,7 @@
 <p id="m">Connecting SteadyHRT…</p>
 <script>
   var q = location.search || '';
-  if (/[?&](code|error)=/.test(q)) location.replace('http://localhost:8765/callback' + q);
+  var pm = /[?&]state=p(\d{4,5})\./.exec(q), port = pm ? pm[1] : '8765';   // callers may name their own local port in state: p<port>.<random>
+  if (/[?&](code|error)=/.test(q)) location.replace('http://localhost:' + port + '/callback' + q);
   else document.getElementById('m').textContent = 'Nothing to do here.';
 </script></body></html>
