@@ -3,7 +3,7 @@
 // - email-only sign-up to FormSubmit (JSON), then the thank-you state: free checklist link + ONE optional question
 //   (price preference + GLP-1) sent as a second FormSubmit message and an Umami "price_pick" event
 // - message match ("From the post: ..."), mobile sticky bar, Umami funnel events:
-//   start_view, form_in_view, email_focus, submit_click, signup, price_pick, checklist_click, sticky_click
+//   start_view, form_in_view, email_focus, submit_click (valid email only; submit_invalid = empty/invalid), signup, price_pick, checklist_click, sticky_click
 (function () {
   var K = ['utm_source', 'utm_campaign'], s = {};
   try {
@@ -74,9 +74,9 @@
     f.addEventListener('submit', function (e) {
       e.preventDefault();
       if (f._honey && f._honey.value) return;
-      track('submit_click');
       var em = f.elements.email.value.trim();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { msg.textContent = 'Please enter a valid email address.'; return; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { track('submit_invalid'); msg.textContent = 'Please enter a valid email address.'; return; }
+      track('submit_click');   // only a valid address counts as an attempt: submit_click without signup = the POST failed
       var b = f.querySelector('button[type=submit]'); b.disabled = true; msg.textContent = '';
       post(f.action, { email: em, utm_source: src, utm_campaign: cam, page: location.pathname, _captcha: 'false', _template: 'table', _subject: 'SteadyHRT waitlist signup (' + src + ')' })
         .then(function () { track('signup'); signedUp = true; syncSticky(); thankYou(box, f.action, em); })
