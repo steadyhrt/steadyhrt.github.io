@@ -62,7 +62,7 @@
   });
 
   function post(action, body) {
-    return fetch(action, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) })
+    return fetch(action, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body), keepalive: true })
       .then(function (r) { return r.json(); }).then(function (j) { if (!(j && (j.success === true || j.success === 'true'))) throw 0; return j; });
   }
 
@@ -78,9 +78,10 @@
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { track('submit_invalid'); msg.textContent = 'Please enter a valid email address.'; return; }
       track('submit_click');   // only a valid address counts as an attempt: submit_click without signup = the POST failed
       var b = f.querySelector('button[type=submit]'); b.disabled = true; msg.textContent = '';
+      var slow = setTimeout(function () { msg.textContent = 'Sending… this can take up to a minute. Please keep this page open.'; }, 4000);
       post(f.action, { email: em, utm_source: src, utm_campaign: cam, page: location.pathname, _captcha: 'false', _template: 'table', _subject: 'SteadyHRT waitlist signup (' + src + ')' })
-        .then(function () { track('signup'); signedUp = true; syncSticky(); thankYou(box, f.action, em); })
-        .catch(function () { b.disabled = false; msg.textContent = 'Sorry, that did not go through. Please try again in a moment.'; });
+        .then(function () { clearTimeout(slow); track('signup'); signedUp = true; syncSticky(); thankYou(box, f.action, em); })
+        .catch(function () { clearTimeout(slow); b.disabled = false; msg.textContent = 'Sorry, that did not go through. Please try again in a moment.'; });
     });
   });
 
