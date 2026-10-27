@@ -86,7 +86,7 @@
   });
 
   function thankYou(box, action, em) {
-    box.innerHTML = '<h3>You’re on the list</h3><p>Thank you. We’ll email you once, when the app is ready.</p>' +
+    box.innerHTML = '<h3>You’re on the list</h3><p>Thank you. We’ve also emailed you the checklist (check your spam or promotions folder if you don’t see it in a few minutes). We’ll email you once more, when the app is ready.</p>' +
       '<p><a class="btn" data-checklist href="/checklist/">Open your free doctor-visit checklist</a></p>' +
       '<p class="src"><a data-checklist href="/checklist/steadyhrt-doctor-visit-checklist.pdf">Download the PDF</a></p>' +
       '<div class="ask"><p><strong>One optional question</strong><br>If it cost one of these after the free start, which would you pick?</p>' +
