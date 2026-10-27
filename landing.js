@@ -3,7 +3,7 @@
 // - email-only sign-up to FormSubmit (JSON), then the thank-you state: free checklist link + ONE optional question
 //   (price preference + GLP-1) sent as a second FormSubmit message and an Umami "price_pick" event
 // - message match ("From the post: ..."), mobile sticky bar, Umami funnel events:
-//   start_view, form_in_view, email_focus, submit_click (valid email only; submit_invalid = empty/invalid), signup, price_pick, checklist_click, sticky_click
+//   start_view, dwell_10s, form_in_view, email_focus, submit_click (valid email only; submit_invalid = empty/invalid), signup, price_pick, checklist_click, sticky_click
 (function () {
   var K = ['utm_source', 'utm_campaign'], s = {};
   try {
@@ -36,6 +36,8 @@
   var boxes = document.querySelectorAll('[data-wl-box]');
   var sticky = document.querySelector('[data-sticky]');
   if (boxes.length) first('start_view');
+  // dwell_10s: still on the page after 10 s (separates bounces from people who read but never tap the form)
+  if (boxes.length) setTimeout(function () { if (!document.hidden) first('dwell_10s'); }, 10000);
 
   // Message match: "From the post: <title>" when utm_campaign starts with a post number.
   var from = document.querySelector('[data-from]');
@@ -70,7 +72,8 @@
     var f = box.querySelector('form[data-wl]'), msg = box.querySelector('.wl-msg');
     if (!f) return;
     f.elements.utm_source.value = src; f.elements.utm_campaign.value = cam;
-    f.elements.email.addEventListener('focus', function () { first('email_focus'); });
+    // several events, not just focus: in-app browsers (Instagram/Facebook webviews) can miss a plain focus event; the first one wins (first() is once per page)
+    ['focus', 'focusin', 'touchstart', 'pointerdown', 'click', 'input'].forEach(function (ev) { f.elements.email.addEventListener(ev, function () { first('email_focus'); }); });
     f.addEventListener('submit', function (e) {
       e.preventDefault();
       if (f._honey && f._honey.value) return;
