@@ -43,6 +43,8 @@
   if (src === 'meta_ads' && window.STEADY_AD && window.STEADY_AD[cam]) {
     var v = window.STEADY_AD[cam];
     [['[data-h1]', v.headline], ['[data-lead]', v.lead], ['[data-btn]', v.button]].forEach(function (p) { var el = document.querySelector(p[0]); if (el && p[1]) el.textContent = p[1]; });
+    var fine = document.querySelector('[data-wl-box] .wl-fine');
+    if (fine && v.note) { var n = document.createElement('span'); n.textContent = v.note + ' '; fine.insertBefore(n, fine.firstChild); }
   }
 
   // Message match: "From the post: <title>" when utm_campaign starts with a post number.
