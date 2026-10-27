@@ -39,6 +39,12 @@
   // dwell_10s: still on the page after 10 s (separates bounces from people who read but never tap the form)
   if (boxes.length) setTimeout(function () { if (!document.hidden) first('dwell_10s'); }, 10000);
 
+  // Ad variant (ADS-RUN directive): meta_ads visitors get the headline/lead/button that repeats the ad they clicked; everyone else keeps the page as built.
+  if (src === 'meta_ads' && window.STEADY_AD && window.STEADY_AD[cam]) {
+    var v = window.STEADY_AD[cam];
+    [['[data-h1]', v.headline], ['[data-lead]', v.lead], ['[data-btn]', v.button]].forEach(function (p) { var el = document.querySelector(p[0]); if (el && p[1]) el.textContent = p[1]; });
+  }
+
   // Message match: "From the post: <title>" when utm_campaign starts with a post number.
   var from = document.querySelector('[data-from]');
   if (from && window.STEADY_FROM) {
