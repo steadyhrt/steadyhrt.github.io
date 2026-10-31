@@ -42,28 +42,35 @@
     document.querySelectorAll('a[href$=".pdf"]').forEach(function (a) { a.addEventListener('click', function () { track('checklist_pdf', { token: tk, via: 'email' }); }); });
   }
 
-  // Price question on /checklist/ (owner decision Oct 31: not in the Meta form). Shown only to people who arrive with ?t=<token> or utm_source=meta_ads*, placed after the
-  // checklist so it never blocks the PDF. One tap -> Umami checklist_price {option, token?, utm_source} plus checklist_price_<option> (the Umami events list shows names, not data,
-  // so the option rides in the second name for engine/checklist-clicks.mjs). No email is ever in a URL.
+  // Price question on /checklist/ (owner decision Oct 31: not in the Meta form). Shown only to people who arrive with ?t=<token> or utm_source=meta_ads*, placed under the intro and
+  // never blocking the PDF. Radio-style: a tap only selects (changeable); "Confirm" fires Umami checklist_price {option, token?, utm_source} plus checklist_price_<option> (the Umami
+  // events list shows names, not data, so the option rides in the second name for engine/checklist-clicks.mjs). Plain taps send nothing; the latest confirmed answer per token wins
+  // (counted in checklist-clicks.mjs). No email is ever in a URL.
   (function () {
     var box = document.querySelector('[data-price]');
     if (!box || !/^\/checklist\/?$/.test(location.pathname)) return;
-    var ok = /^[fwtc][a-z0-9]{14}$/.test(tk) || /^meta_ads/.test(src), done = false;
-    try { done = sessionStorage.getItem('price_done') === '1'; } catch (e) {}
+    var ok = /^[fwtc][a-z0-9]{14}$/.test(tk) || /^meta_ads/.test(src);
     if (!ok) return;
     box.hidden = false;
-    var thanks = box.querySelector('[data-price-thanks]'), opts = box.querySelector('[data-price-opts]');
-    if (done) { opts.hidden = true; thanks.hidden = false; return; }
-    box.querySelectorAll('[data-price-opt]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (done) return; done = true;
-        var o = b.getAttribute('data-price-opt'), d = { option: o };
-        if (/^[fwtc][a-z0-9]{14}$/.test(tk)) d.token = tk;
-        track('checklist_price', d); track('checklist_price_' + o, d.token ? { token: d.token } : {});
-        try { sessionStorage.setItem('price_done', '1'); } catch (e) {}
-        opts.hidden = true; thanks.hidden = false;
-      });
+    var group = box.querySelector('[data-price-opts]'), btns = box.querySelectorAll('[data-price-opt]'), confirm = box.querySelector('[data-price-confirm]');
+    var thanks = box.querySelector('[data-price-thanks]'), change = box.querySelector('[data-price-change]');
+    var sel = '', saved = '';
+    try { saved = sessionStorage.getItem('price_answer') || ''; } catch (e) {}
+    function paint() { btns.forEach(function (b) { b.setAttribute('aria-checked', b.getAttribute('data-price-opt') === sel ? 'true' : 'false'); }); }
+    function lock(on) { group.classList.toggle('locked', on); btns.forEach(function (b) { b.disabled = on; }); confirm.hidden = on; thanks.hidden = !on; confirm.disabled = !sel; }
+    if (saved) { sel = saved; paint(); lock(true); }
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () { sel = b.getAttribute('data-price-opt'); paint(); confirm.disabled = false; });
     });
+    confirm.addEventListener('click', function () {
+      if (!sel) return;
+      var d = { option: sel };
+      if (/^[fwtc][a-z0-9]{14}$/.test(tk)) d.token = tk;
+      track('checklist_price', d); track('checklist_price_' + sel, d.token ? { token: d.token } : {});
+      try { sessionStorage.setItem('price_answer', sel); } catch (e) {}
+      lock(true);
+    });
+    change.addEventListener('click', function (e) { e.preventDefault(); try { sessionStorage.removeItem('price_answer'); } catch (x) {} lock(false); });
   })();
 
   var once = {};
