@@ -3,7 +3,8 @@
 // - email-only sign-up to FormSubmit (JSON), then the thank-you state: free checklist link + ONE optional question
 //   (price preference + GLP-1) sent as a second FormSubmit message and an Umami "price_pick" event
 // - message match ("From the post: ..."), mobile sticky bar, Umami funnel events:
-//   start_view, dwell_10s, form_in_view, email_focus, submit_click (valid email only; submit_invalid = empty/invalid), signup, price_pick, checklist_click, sticky_click
+//   start_view, dwell_10s, form_in_view, email_focus, submit_click (valid email only; submit_invalid = empty/invalid), signup, price_pick, checklist_click, sticky_click,
+//   checklist_open/engaged/pdf (mail link), checklist_price + checklist_price_<option> (price question on /checklist/)
 (function () {
   var K = ['utm_source', 'utm_campaign'], s = {};
   try {
@@ -40,6 +41,30 @@
     ['pointerdown', 'touchstart', 'scroll', 'keydown'].forEach(function (ev) { window.addEventListener(ev, onEng, { passive: true, once: true }); });
     document.querySelectorAll('a[href$=".pdf"]').forEach(function (a) { a.addEventListener('click', function () { track('checklist_pdf', { token: tk, via: 'email' }); }); });
   }
+
+  // Price question on /checklist/ (owner decision Oct 31: not in the Meta form). Shown only to people who arrive with ?t=<token> or utm_source=meta_ads*, placed after the
+  // checklist so it never blocks the PDF. One tap -> Umami checklist_price {option, token?, utm_source} plus checklist_price_<option> (the Umami events list shows names, not data,
+  // so the option rides in the second name for engine/checklist-clicks.mjs). No email is ever in a URL.
+  (function () {
+    var box = document.querySelector('[data-price]');
+    if (!box || !/^\/checklist\/?$/.test(location.pathname)) return;
+    var ok = /^[fwtc][a-z0-9]{14}$/.test(tk) || /^meta_ads/.test(src), done = false;
+    try { done = sessionStorage.getItem('price_done') === '1'; } catch (e) {}
+    if (!ok) return;
+    box.hidden = false;
+    var thanks = box.querySelector('[data-price-thanks]'), opts = box.querySelector('[data-price-opts]');
+    if (done) { opts.hidden = true; thanks.hidden = false; return; }
+    box.querySelectorAll('[data-price-opt]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (done) return; done = true;
+        var o = b.getAttribute('data-price-opt'), d = { option: o };
+        if (/^[fwtc][a-z0-9]{14}$/.test(tk)) d.token = tk;
+        track('checklist_price', d); track('checklist_price_' + o, d.token ? { token: d.token } : {});
+        try { sessionStorage.setItem('price_done', '1'); } catch (e) {}
+        opts.hidden = true; thanks.hidden = false;
+      });
+    });
+  })();
 
   var once = {};
   function first(name, extra) { if (!once[name]) { once[name] = 1; track(name, extra); } }
