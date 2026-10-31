@@ -30,6 +30,17 @@
     }, 300); }
   }
 
+  // Tracked checklist link (mail variant, switched off until the owner approves it): /checklist/?t=<token>. The token is random per person and carries no email;
+  // checklist_open fires on load, checklist_engaged on the first real touch/scroll/key (link scanners never do that), checklist_pdf on the PDF link.
+  var tk = '';
+  try { tk = (new URLSearchParams(location.search).get('t') || '').toLowerCase(); } catch (e) {}
+  if (/^\/checklist\/?$/.test(location.pathname) && /^[fwtc][a-z0-9]{14}$/.test(tk)) {
+    track('checklist_open', { token: tk, via: 'email' });
+    var eng = false, onEng = function () { if (eng) return; eng = true; track('checklist_engaged', { token: tk, via: 'email' }); };
+    ['pointerdown', 'touchstart', 'scroll', 'keydown'].forEach(function (ev) { window.addEventListener(ev, onEng, { passive: true, once: true }); });
+    document.querySelectorAll('a[href$=".pdf"]').forEach(function (a) { a.addEventListener('click', function () { track('checklist_pdf', { token: tk, via: 'email' }); }); });
+  }
+
   var once = {};
   function first(name, extra) { if (!once[name]) { once[name] = 1; track(name, extra); } }
 
